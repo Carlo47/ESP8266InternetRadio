@@ -76,11 +76,11 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <LittleFS.h>
-#include <AudioGeneratorMP3.h>
-#include <AudioFileSourceICYStream.h>
-#include <AudioFileSourceBuffer.h>
-#include <AudioOutputI2S.h>
-#include <AudioOutputI2SNoDAC.h>
+#include "AudioGeneratorMP3.h"
+#include "AudioFileSourceICYStream.h"
+#include "AudioFileSourceBuffer.h"
+#include "AudioOutputI2S.h"
+#include "AudioOutputI2SNoDAC.h"
 #include "PushButton.h"
 
 #define EXTERNAL_DAC  // this line only if we use an external DAC
