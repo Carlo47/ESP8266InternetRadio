@@ -74,6 +74,7 @@
  *              https://www.hackster.io/earlephilhower/esp8266-digital-radio-ee747f
  */
 #include <Arduino.h>
+#include <LittleFS.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266Audio.h>
 #include "PushButton.h"
