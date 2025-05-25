@@ -201,16 +201,24 @@ void stopPlaying()
  */
 void startPlaying()
 {
+  Serial.println(F("DEBUG: startPlaying() starting"));
   stopPlaying();
+  Serial.println(F("DEBUG: startPlaying calling initStream()"));
   initStream();
-  out->SetGain(((float)volume)/100.0);
-  if (!decoder->isRunning()) 
+  Serial.println(F("DEBUG: startPlaying initStream() returned"));
+  if (out) out->SetGain(((float)volume)/100.0); // Null check for out
+  Serial.println(F("DEBUG: out->SetGain() called"));
+  if (decoder && !decoder->isRunning()) // Null check for decoder
   {
+    Serial.println(F("DEBUG: decoder->isRunning() checked"));
     Serial.printf_P(PSTR("Can't connect to URL, try next station\n"));
     nextStation();
   }
-  else
+  else if (decoder) // Check if decoder is not null before printing success
     Serial.printf_P(PSTR("URL connected, now playing\n"));
+  else
+    Serial.println(F("DEBUG: Decoder is null, cannot play."));
+  Serial.println(F("DEBUG: startPlaying() completed or deferred"));
 }
 
 /**
@@ -315,16 +323,34 @@ Connection Details:
  */
 void initStream()
 {
+  Serial.println(F("DEBUG: initStream() starting"));
   file = new AudioFileSourceICYStream(station[currentStation].url);
+  if (file == NULL) {
+    Serial.println(F("FATAL: new AudioFileSourceICYStream() failed!"));
+    while(true) { delay(1000); ESP.wdtFeed(); }
+  }
+  Serial.println(F("DEBUG: AudioFileSourceICYStream object created."));
   //file = new AudioFileSourceHTTPStream(station[currentStation].url);
   file->RegisterMetadataCB(cbMetaData, (void *)"ICY");
 
   buff = new AudioFileSourceBuffer(file, preallocateBuffer, preallocateBufferSize);
+  if (buff == NULL) {
+    Serial.println(F("FATAL: new AudioFileSourceBuffer() failed!"));
+    while(true) { delay(1000); ESP.wdtFeed(); }
+  }
+  Serial.println(F("DEBUG: AudioFileSourceBuffer object created."));
   buff->RegisterStatusCB(cbStatus, (void *)"buffer");
 
   decoder = new AudioGeneratorMP3(preallocateCodec, preallocateCodecSize);
+  if (decoder == NULL) {
+    Serial.println(F("FATAL: new AudioGeneratorMP3() failed!"));
+    while(true) { delay(1000); ESP.wdtFeed(); }
+  }
+  Serial.println(F("DEBUG: AudioGeneratorMP3 object created."));
   decoder->RegisterStatusCB(cbStatus, (void *)"mp3");
   decoder->begin(buff, out);
+  Serial.println(F("DEBUG: decoder->begin() called"));
+  Serial.println(F("DEBUG: initStream() completed"));
 }
 
 /**
@@ -349,13 +375,26 @@ void initWiFi()
  */
 void initAudio()
 {
+  Serial.println(F("DEBUG: initAudio_internal starting"));
   audioLogger = &Serial;
   #ifdef EXTERNAL_DAC
     out = new AudioOutputI2S();  // with external MAX98357 DAC/amplifier
+    if (out == NULL) { 
+      Serial.println(F("FATAL: new AudioOutput object failed!")); 
+      while(true) { delay(1000); ESP.wdtFeed(); } 
+    }
+    Serial.println(F("DEBUG: AudioOutput object created."));
   #else
     out = new AudioOutputI2SNoDAC();
+    if (out == NULL) { 
+      Serial.println(F("FATAL: new AudioOutput object failed!")); 
+      while(true) { delay(1000); ESP.wdtFeed(); } 
+    }
+    Serial.println(F("DEBUG: AudioOutput object created."));
   #endif
+  Serial.println(F("DEBUG: initAudio_internal calling startPlaying()"));
   startPlaying();
+  Serial.println(F("DEBUG: initAudio_internal completed"));
 }
 
 /**
@@ -363,28 +402,45 @@ void initAudio()
  */
 void initBuffers()
 {
+  Serial.println(F("DEBUG: initBuffers_internal starting"));
   preallocateBuffer = malloc(preallocateBufferSize);
   preallocateCodec  = malloc(preallocateCodecSize);
   if (!preallocateBuffer || !preallocateCodec) 
   {
     Serial.printf_P(PSTR("FATAL ERROR:  Unable to preallocate %d bytes for app\n"), preallocateBufferSize+preallocateCodecSize);
-    while (true) delay(1000); // Infinite halt
+    while (true) { delay(1000); ESP.wdtFeed(); } // Infinite halt, added WDT feed
   }
+  Serial.println(F("DEBUG: initBuffers_internal completed"));
 }
 
 void setup()
 {
   Serial.begin(115200);
   delay(1000);
+  Serial.println(F("DEBUG: Setup starting")); // F() macro for PROGMEM strings
+
+  Serial.println(F("DEBUG: Initializing LittleFS..."));
+  if (!LittleFS.begin()) {
+    Serial.println(F("FATAL: LittleFS.begin() failed!"));
+    while (true) { delay(1000); ESP.wdtFeed(); } // Halt with WDT feed
+  }
+  Serial.println(F("DEBUG: LittleFS initialized successfully."));
 
   // add callbacks to pushbutton
   button.addOnClickCB(nextStation);
   button.addOnLongClickCB(prevStation);
   button.addOnDoubleClickCB(showCurrent);
 
+  Serial.println(F("DEBUG: initBuffers() starting"));
   initBuffers();
+  Serial.println(F("DEBUG: initBuffers() completed"));
+  Serial.println(F("DEBUG: initWiFi() starting"));
   initWiFi();
+  Serial.println(F("DEBUG: initWiFi() completed"));
+  Serial.println(F("DEBUG: initAudio() starting"));
   initAudio();
+  Serial.println(F("DEBUG: initAudio() completed"));
+  Serial.println(F("DEBUG: Setup completed"));
 }
 
 void loop()
