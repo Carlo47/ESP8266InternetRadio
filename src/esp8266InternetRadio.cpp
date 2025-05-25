@@ -371,6 +371,7 @@ void initWiFi()
   }
   Serial.println("Connected");
   printConnectionDetails();
+  Serial.printf_P(PSTR("DEBUG: Free heap AFTER WiFi connected: %u\n"), ESP.getFreeHeap());
 }
 
 /**
