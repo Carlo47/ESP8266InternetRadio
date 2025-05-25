@@ -358,6 +358,7 @@ void initStream()
  */
 void initWiFi()
 {
+  Serial.printf_P(PSTR("DEBUG: Free heap before WiFi.begin(): %u\n"), ESP.getFreeHeap());
   Serial.printf_P(PSTR("DEBUG: Attempting to connect to SSID: %s\n"), ssid);
   Serial.println("Connecting to WiFi");
   WiFi.begin(ssid, password);
