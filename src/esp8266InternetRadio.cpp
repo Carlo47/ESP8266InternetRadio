@@ -122,7 +122,7 @@ int volume = 100;
 char title[64];
 char status[64];
 const int preallocateBufferSize = 4*1024;
-const int preallocateCodecSize  = 10*1024; // MP3 codec max mem needed
+const int preallocateCodecSize  = 29192; // MP3 codec max mem needed
 void *preallocateBuffer = NULL;
 void *preallocateCodec  = NULL;
 
