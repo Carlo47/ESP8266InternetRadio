@@ -76,7 +76,7 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <LittleFS.h>
-#include "AudioGeneratorMP3.h"
+#include "AudioGeneratorAAC.h"
 #include "AudioFileSourceICYStream.h"
 #include "AudioFileSourceBuffer.h"
 #include "AudioOutputI2S.h"
@@ -122,11 +122,11 @@ int volume = 100;
 char title[64];
 char status[64];
 const int preallocateBufferSize = 2*1024;
-const int preallocateCodecSize  = 29192; // MP3 codec max mem needed
+const int preallocateCodecSize  = 22736; // MP3 codec max mem needed
 void *preallocateBuffer = NULL;
 void *preallocateCodec  = NULL;
 
-AudioGeneratorMP3         *decoder;
+AudioGeneratorAAC         *decoder;
 AudioFileSourceICYStream  *file;
 //AudioFileSourceHTTPStream *file;  // there are more functioning stations than with ICYstream, but no metadata is displayed
 AudioFileSourceBuffer     *buff;
@@ -341,13 +341,13 @@ void initStream()
   Serial.println(F("DEBUG: AudioFileSourceBuffer object created."));
   buff->RegisterStatusCB(cbStatus, (void *)"buffer");
 
-  decoder = new AudioGeneratorMP3(preallocateCodec, preallocateCodecSize);
+  decoder = new AudioGeneratorAAC(preallocateCodec, preallocateCodecSize);
   if (decoder == NULL) {
-    Serial.println(F("FATAL: new AudioGeneratorMP3() failed!"));
+    Serial.println(F("FATAL: new AudioGeneratorAAC() failed!"));
     while(true) { delay(1000); ESP.wdtFeed(); }
   }
-  Serial.println(F("DEBUG: AudioGeneratorMP3 object created."));
-  decoder->RegisterStatusCB(cbStatus, (void *)"mp3");
+  Serial.println(F("DEBUG: AudioGeneratorAAC object created."));
+  decoder->RegisterStatusCB(cbStatus, (void *)"aac");
   decoder->begin(buff, out);
   Serial.println(F("DEBUG: decoder->begin() called"));
   Serial.println(F("DEBUG: initStream() completed"));
