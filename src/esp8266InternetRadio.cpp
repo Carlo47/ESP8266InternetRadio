@@ -359,10 +359,12 @@ void initStream()
 void initWiFi()
 {
   Serial.println("Connecting to WiFi");
+  Serial.printf(F("DEBUG: Attempting to connect to SSID: %s\n"), ssid);
   WiFi.begin(ssid, password);
 
   // Try forever
   while (WiFi.status() != WL_CONNECTED) {
+    Serial.printf(F("DEBUG: WiFi status: %d\n"), WiFi.status());
     Serial.println("...Connecting to WiFi");
     delay(1000);
   }
