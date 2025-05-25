@@ -121,8 +121,8 @@ const char *currentUrl = station[currentStation].url;
 int volume = 100;
 char title[64];
 char status[64];
-const int preallocateBufferSize = 12*1024;
-const int preallocateCodecSize  = 29192; // MP3 codec max mem needed
+const int preallocateBufferSize = 4*1024;
+const int preallocateCodecSize  = 10*1024; // MP3 codec max mem needed
 void *preallocateBuffer = NULL;
 void *preallocateCodec  = NULL;
 
@@ -406,13 +406,13 @@ void initAudio()
 void initBuffers()
 {
   Serial.println(F("DEBUG: initBuffers_internal starting"));
-  // preallocateBuffer = malloc(preallocateBufferSize);
-  // preallocateCodec  = malloc(preallocateCodecSize);
-  // if (!preallocateBuffer || !preallocateCodec) 
-  // {
-  //   Serial.printf_P(PSTR("FATAL ERROR:  Unable to preallocate %d bytes for app\n"), preallocateBufferSize+preallocateCodecSize);
-  //   while (true) { delay(1000); ESP.wdtFeed(); } // Infinite halt, added WDT feed
-  // }
+  preallocateBuffer = malloc(preallocateBufferSize);
+  preallocateCodec  = malloc(preallocateCodecSize);
+  if (!preallocateBuffer || !preallocateCodec) 
+  {
+    Serial.printf_P(PSTR("FATAL ERROR:  Unable to preallocate %d bytes for app\n"), preallocateBufferSize+preallocateCodecSize);
+    while (true) { delay(1000); ESP.wdtFeed(); } // Infinite halt
+  }
   Serial.println(F("DEBUG: initBuffers_internal completed"));
 }
 
