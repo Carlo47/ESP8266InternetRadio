@@ -121,7 +121,7 @@ const char *currentUrl = station[currentStation].url;
 int volume = 100;
 char title[64];
 char status[64];
-const int preallocateBufferSize = 8*1024;
+const int preallocateBufferSize = 2*1024;
 const int preallocateCodecSize  = 29192; // MP3 codec max mem needed
 void *preallocateBuffer = NULL;
 void *preallocateCodec  = NULL;
