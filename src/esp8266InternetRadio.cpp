@@ -358,8 +358,8 @@ void initStream()
  */
 void initWiFi()
 {
-  Serial.println("Connecting to WiFi");
   Serial.printf_P(PSTR("DEBUG: Attempting to connect to SSID: %s\n"), ssid);
+  Serial.println("Connecting to WiFi");
   WiFi.begin(ssid, password);
 
   // Try forever
