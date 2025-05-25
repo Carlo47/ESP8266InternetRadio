@@ -406,13 +406,13 @@ void initAudio()
 void initBuffers()
 {
   Serial.println(F("DEBUG: initBuffers_internal starting"));
-  preallocateBuffer = malloc(preallocateBufferSize);
-  preallocateCodec  = malloc(preallocateCodecSize);
-  if (!preallocateBuffer || !preallocateCodec) 
-  {
-    Serial.printf_P(PSTR("FATAL ERROR:  Unable to preallocate %d bytes for app\n"), preallocateBufferSize+preallocateCodecSize);
-    while (true) { delay(1000); ESP.wdtFeed(); } // Infinite halt, added WDT feed
-  }
+  // preallocateBuffer = malloc(preallocateBufferSize);
+  // preallocateCodec  = malloc(preallocateCodecSize);
+  // if (!preallocateBuffer || !preallocateCodec) 
+  // {
+  //   Serial.printf_P(PSTR("FATAL ERROR:  Unable to preallocate %d bytes for app\n"), preallocateBufferSize+preallocateCodecSize);
+  //   while (true) { delay(1000); ESP.wdtFeed(); } // Infinite halt, added WDT feed
+  // }
   Serial.println(F("DEBUG: initBuffers_internal completed"));
 }
 
