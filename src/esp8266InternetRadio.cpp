@@ -76,15 +76,15 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <LittleFS.h>
-#include "AudioGeneratorAAC.h"
+#include "AudioGeneratorMP3.h"
 #include "AudioFileSourceICYStream.h"
 #include "AudioFileSourceBuffer.h"
 #include "AudioOutputI2S.h"
 #include "AudioOutputI2SNoDAC.h"
 #include "PushButton.h"
 
-#define EXTERNAL_DAC  // this line only if we use an external DAC
-#define pinButton D3
+// #define EXTERNAL_DAC  // this line only if we use an external DAC
+#define pinButton 0
 
 typedef struct { const char *name; const char *url; } Radiostation;
 Radiostation station[] =
@@ -121,12 +121,12 @@ const char *currentUrl = station[currentStation].url;
 int volume = 100;
 char title[64];
 char status[64];
-const int preallocateBufferSize = 2*1024;
-const int preallocateCodecSize  = 22736; // MP3 codec max mem needed
+const int preallocateBufferSize = 12*1024;
+const int preallocateCodecSize  = 29192; // MP3 codec max mem needed
 void *preallocateBuffer = NULL;
 void *preallocateCodec  = NULL;
 
-AudioGeneratorAAC         *decoder;
+AudioGeneratorMP3         *decoder;
 AudioFileSourceICYStream  *file;
 //AudioFileSourceHTTPStream *file;  // there are more functioning stations than with ICYstream, but no metadata is displayed
 AudioFileSourceBuffer     *buff;
@@ -311,8 +311,8 @@ Connection Details:
   MAC-Address: %s
   RSSI       : %d (received signal strength indicator)
   )", WiFi.SSID().c_str(),
-      WiFi.hostname().c_str(),  // ESP8266
-      // WiFi.getHostname(),    // ESP32 
+      // WiFi.hostname().c_str(),  // ESP8266
+      WiFi.getHostname(),    // ESP32 
       WiFi.localIP().toString().c_str(),
       WiFi.macAddress().c_str(),
       WiFi.RSSI());  
@@ -384,17 +384,17 @@ void initAudio()
   #ifdef EXTERNAL_DAC
     out = new AudioOutputI2S();  // with external MAX98357 DAC/amplifier
     if (out == NULL) { 
-      Serial.println(F("FATAL: new AudioOutput object failed!")); 
+      Serial.println(F("FATAL: new AudioOutputI2S object failed!")); 
       while(true) { delay(1000); ESP.wdtFeed(); } 
     }
-    Serial.println(F("DEBUG: AudioOutput object created."));
+    Serial.println(F("DEBUG: AudioOutputI2S object created."));
   #else
-    out = new AudioOutputI2SNoDAC();
+    out = new AudioOutputI2S(0, 1); // For internal DAC on ESP32
     if (out == NULL) { 
-      Serial.println(F("FATAL: new AudioOutput object failed!")); 
+      Serial.println(F("FATAL: new AudioOutputI2S object (internal DAC) failed!")); 
       while(true) { delay(1000); ESP.wdtFeed(); } 
     }
-    Serial.println(F("DEBUG: AudioOutput object created."));
+    Serial.println(F("DEBUG: AudioOutputI2S object (internal DAC) created."));
   #endif
   Serial.println(F("DEBUG: initAudio_internal calling startPlaying()"));
   startPlaying();
